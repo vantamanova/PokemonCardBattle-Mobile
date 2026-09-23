@@ -77,11 +77,14 @@ fun PokemonCardView(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // Display the Pokemon's number.
+            // Display the Pokemon's name.
             Text(
-                text = "#${card.number}",
-                color = typeColor,
-                style = MaterialTheme.typography.labelSmall
+                text = card.name,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.labelMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
 
             // Display the Pokemon artwork.
@@ -96,21 +99,8 @@ fun PokemonCardView(
                 )
             }
 
-            // Display the Pokemon's name.
-            Text(
-                text = card.name,
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.labelSmall,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-
             // Display the Pokemon's type and HP.
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+            Column {
                 Text(
                     text = card.type,
                     color = typeColor,
@@ -121,7 +111,8 @@ fun PokemonCardView(
                 Text(
                     text = "HP ${card.hp}",
                     color = Color.White,
-                    style = MaterialTheme.typography.labelSmall
+                    style = MaterialTheme.typography.labelSmall,
+                    maxLines = 1
                 )
             }
         }

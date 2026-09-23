@@ -12,7 +12,7 @@ import com.example.pokemoncardbattle.Player
 import com.example.pokemoncardbattle.PokemonCard
 import com.example.pokemoncardbattle.PokemonCardView
 
-// Displays the current player's hand and handles card selection.
+// Displays the current player's hand and handles card selection
 @Composable
 fun PlayerHand(
     player: Player,
@@ -27,7 +27,7 @@ fun PlayerHand(
         // Display the current player's information.
         Text(
             text = "${player.name}'s turn",
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground
         )
 
