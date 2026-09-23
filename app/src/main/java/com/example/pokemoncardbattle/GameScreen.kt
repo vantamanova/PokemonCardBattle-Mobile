@@ -12,6 +12,11 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.example.pokemoncardbattle.components.Scoreboard
+import com.example.pokemoncardbattle.components.BattleArea
+import com.example.pokemoncardbattle.components.PlayerHand
+import com.example.pokemoncardbattle.components.GameResults
+import com.example.pokemoncardbattle.components.GameControls
 
 // Displays the main game screen with players and the battle area.
 @Composable
@@ -33,10 +38,6 @@ fun GameScreen(onBack: () -> Unit) {
 
         gamePlayers
     }
-
-    val vera = players[0]
-    val daniil = players[1]
-    val sofia = players[2]
 
     // Create the game once.
     val game = remember { Game() }
@@ -100,237 +101,130 @@ fun GameScreen(onBack: () -> Unit) {
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
 
-        // Opponents
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text("${daniil.name} — Score: ${daniil.score}")
-            Text("Cards: ${daniil.hand.size}")
+        // Display the scoreboard for all three players.
+        Scoreboard(
+            players = players,
+            playerHands = playerHands
+        )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text("${sofia.name} — Score: ${sofia.score}")
-            Text("Cards: ${sofia.hand.size}")
-        }
-
-        // Battle area
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "BATTLE AREA",
-                style = MaterialTheme.typography.headlineMedium
-            )
-
-            Text("Lead type: ${leadType ?: "Not selected"}")
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Display all cards played during the current turn.
-            if (visiblePlayedCards.isNotEmpty()) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    visiblePlayedCards.forEach { (player, card) ->
-                        Column(
-                            modifier = Modifier.weight(1f),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = player.name,
-                                style = MaterialTheme.typography.labelSmall
-                            )
-
-                            PokemonCardView(
-                                card = card,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
-                }
-            } else {
-                Text("Played cards will appear here")
-            }
-        }
+        // Battle area.
+        BattleArea(
+            leadType = leadType,
+            visiblePlayedCards = visiblePlayedCards
+        )
 
         // Current player
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Display player information only while the turn is active.
-            if (turnWinner == null) {
-                Text("${currentPlayer.name} — Score: ${currentPlayer.score}")
-                Text("Current turn: ${currentPlayer.name}")
-            }
+            // Display the current player's hand.
+            if (!waitingForNextPlayer && turnWinner == null) {
 
-            // Display five Pokemon cards.
-            if (!waitingForNextPlayer) {
+                PlayerHand(
+                    player = currentPlayer,
+                    cards = currentHand,
+                    errorMessage = errorMessage,
+                    onCardSelected = { card ->
 
-                if (errorMessage != null) {
-                    Text(
-                        text = errorMessage!!,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
+                        // Prevent players from playing more than one card per turn.
+                        if (currentPlayer !in game.playedCards) {
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(2.dp)
-                ) {
-                    currentHand.forEach { card ->
-                        PokemonCardView(
-                            card = card,
-                            modifier = Modifier.weight(1f),
-                            onClick = {
+                            // Validate the selected card using our existing game logic.
+                            val success = game.playCard(
+                                player = currentPlayer,
+                                card = card,
+                                leadType = leadType
+                            )
 
-                                if (currentPlayer !in game.playedCards) {
+                            if (success) {
 
-                                    val success = game.playCard(
-                                        player = currentPlayer,
-                                        card = card,
-                                        leadType = leadType
-                                    )
-
-                                    if (success) {
-
-                                        // The first played card establishes the lead type.
-                                        if (leadType == null) {
-                                            leadType = card.type
-                                        }
-
-                                        // Update the hand and battle area.
-                                        currentHand.remove(card)
-
-                                        // Add the selected card to the visible battle area.
-                                        visiblePlayedCards.add(currentPlayer to card)
-
-                                        // Clear previous errors.
-                                        errorMessage = null
-
-                                        // Hide the hand until the next player is ready.
-                                        waitingForNextPlayer = true
-
-                                    } else {
-
-                                        // Explain why the selected card cannot be played.
-                                        errorMessage = "You must play a $leadType Pokémon!"
-                                    }
+                                // The first played card establishes the lead type.
+                                if (leadType == null) {
+                                    leadType = card.type
                                 }
+
+                                // Update the hand and battle area.
+                                currentHand.remove(card)
+
+                                // Add the selected card to the visible battle area.
+                                visiblePlayedCards.add(currentPlayer to card)
+
+                                // Clear previous errors.
+                                errorMessage = null
+
+                                // Hide the hand until the next player is ready.
+                                waitingForNextPlayer = true
+
+                            } else {
+
+                                // Explain why the selected card cannot be played.
+                                errorMessage = "You must play a $leadType Pokémon!"
                             }
-                        )
-                    }
-                }
-            }
-
-            if (waitingForNextPlayer && currentPlayerIndex < turnOrder.lastIndex) {
-
-                Button(
-                    onClick = {
-                        // Move to the next player.
-                        currentPlayerIndex++
-                        waitingForNextPlayer = false
-                        errorMessage = null
-                    }
-                ) {
-                    Text("NEXT PLAYER")
-                }
-            }
-
-            // Show the result button after all three players have played.
-            if (
-                waitingForNextPlayer &&
-                currentPlayerIndex == turnOrder.lastIndex &&
-                turnWinner == null
-            ) {
-                Button(
-                    onClick = {
-                        // Calculate the winner and update the score.
-                        turnWinner = game.determineTurnWinner()
-
-                        // Check whether all players have finished their cards.
-                        if (players.all { it.hand.isEmpty() }) {
-                            gameWinners = game.determineGameWinner(players)
                         }
                     }
-                ) {
-                    Text("SHOW RESULT")
-                }
-            }
-
-            // Display the winner and their updated score.
-            if (turnWinner != null) {
-
-                Text(
-                    text = "🏆 ${turnWinner!!.name} wins this turn!",
-                    style = MaterialTheme.typography.titleLarge
-                )
-
-                Text(
-                    text = "Score: ${turnWinner!!.score}",
-                    style = MaterialTheme.typography.titleMedium
                 )
             }
 
-            // Start a new turn with the previous winner.
-            if (turnWinner != null && players.any { it.hand.isNotEmpty() }) {
+            // Display turn results and final game results.
+            GameResults(
+                turnWinner = turnWinner,
+                gameWinners = gameWinners,
+                players = players
+            )
 
-                Button(
-                    onClick = {
-                        // The winner starts the next turn.
-                        turnOrder = game.getTurnOrder(players, turnWinner!!)
+            // Display navigation and game progression buttons.
+            GameControls(
+                showNextPlayer = waitingForNextPlayer &&
+                        currentPlayerIndex < turnOrder.lastIndex,
 
-                        // Clear cards from the previous turn.
-                        game.playedCards.clear()
-                        visiblePlayedCards.clear()
+                showResult = waitingForNextPlayer &&
+                        currentPlayerIndex == turnOrder.lastIndex &&
+                        turnWinner == null,
 
-                        // Reset turn information.
-                        currentPlayerIndex = 0
-                        leadType = null
-                        errorMessage = null
-                        waitingForNextPlayer = false
-                        turnWinner = null
+                showNextTurn = turnWinner != null &&
+                        players.any { it.hand.isNotEmpty() },
+
+                onNextPlayer = {
+                    // Move to the next player.
+                    currentPlayerIndex++
+                    waitingForNextPlayer = false
+                    errorMessage = null
+                },
+
+                onShowResult = {
+                    // Calculate the winner and update the score.
+                    turnWinner = game.determineTurnWinner()
+
+                    // Check whether all players have finished their cards.
+                    if (players.all { it.hand.isEmpty() }) {
+                        gameWinners = game.determineGameWinner(players)
                     }
-                ) {
-                    Text("NEXT TURN")
-                }
-            }
+                },
 
-            // Display the final game result when all cards have been played.
-            if (gameWinners != null) {
+                onNextTurn = {
+                    // The winner starts the next turn.
+                    turnOrder = game.getTurnOrder(players, turnWinner!!)
 
-                Text(
-                    text = "GAME OVER!",
-                    style = MaterialTheme.typography.headlineMedium
-                )
+                    // Clear cards from the previous turn.
+                    game.playedCards.clear()
+                    visiblePlayedCards.clear()
 
-                if (gameWinners!!.size == 1) {
+                    // Reset turn information.
+                    currentPlayerIndex = 0
+                    leadType = null
+                    errorMessage = null
+                    waitingForNextPlayer = false
+                    turnWinner = null
+                },
 
-                    // Display a single winner.
-                    val winner = gameWinners!!.first()
-
-                    Text("${winner.name} wins the game!")
-                    Text("Final score: ${winner.score}")
-
-                } else {
-
-                    // Display tied winners.
-                    Text("It's a tie!")
-
-                    gameWinners!!.forEach { winner ->
-                        Text("${winner.name}: ${winner.score} points")
-                    }
-                }
-            }
+                onBack = onBack
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(onClick = onBack) {
-                Text("BACK TO HOME")
-            }
         }
     }
 }
