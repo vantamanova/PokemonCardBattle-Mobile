@@ -21,12 +21,14 @@ fun PlayerHand(
     onCardSelected: (PokemonCard) -> Unit
 ) {
     Column(
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Display the current player's information.
         Text(
             text = "${player.name}'s turn",
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -35,24 +37,33 @@ fun PlayerHand(
         if (errorMessage != null) {
             Text(
                 text = errorMessage,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.error
             )
         }
 
         // Display the current player's Pokemon cards.
-        Row(
+        BoxWithConstraints(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(2.dp)
+            contentAlignment = Alignment.Center
         ) {
-            cards.forEach { card ->
-                PokemonCardView(
-                    card = card,
-                    modifier = Modifier.weight(1f),
-                    onClick = {
-                        // Send the selected card to GameScreen for validation.
-                        onCardSelected(card)
-                    }
-                )
+            // Calculate card width based on the space available for five cards.
+            val cardWidth = (maxWidth - 16.dp) / 5
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                cards.forEach { card ->
+                    PokemonCardView(
+                        card = card,
+                        modifier = Modifier.width(cardWidth),
+                        onClick = {
+                            // Send the selected card to GameScreen for validation.
+                            onCardSelected(card)
+                        }
+                    )
+                }
             }
         }
     }

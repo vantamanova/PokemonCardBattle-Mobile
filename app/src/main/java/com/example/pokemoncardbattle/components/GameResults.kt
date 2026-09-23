@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 import com.example.pokemoncardbattle.Player
@@ -16,6 +17,7 @@ fun GameResults(
     players: List<Player>
 ) {
     Column(
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -23,23 +25,26 @@ fun GameResults(
         if (turnWinner != null) {
             Text(
                 text = "🏆 ${turnWinner.name} wins this turn!",
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary
             )
 
             Text(
                 text = "Score: ${turnWinner.score}",
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
 
         // Display the final game result when all cards have been played.
         if (gameWinners != null) {
 
-            Spacer(modifier = androidx.compose.ui.Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Text(
                 text = "GAME OVER!",
-                style = MaterialTheme.typography.headlineMedium
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary
             )
 
             if (gameWinners.size == 1) {
@@ -47,30 +52,38 @@ fun GameResults(
                 // Display a single winner.
                 val winner = gameWinners.first()
 
-                Text("${winner.name} wins the game!")
-                Text("Final score: ${winner.score}")
+                Text(
+                    text = "${winner.name} wins the game!",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+
+                Text(
+                    text = "Final score: ${winner.score}",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
 
             } else {
 
                 // Display tied winners.
-                Text("It's a tie!")
+                Text(
+                    text = "It's a tie!",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
 
                 gameWinners.forEach { winner ->
-                    Text("${winner.name}: ${winner.score} points")
+                    Text(
+                        text = "${winner.name}: ${winner.score} points",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
 
-            Spacer(modifier = androidx.compose.ui.Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Display the final scores for all players.
-            Text(
-                text = "FINAL SCORES",
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            players.forEach { player ->
-                Text("${player.name}: ${player.score} points")
-            }
         }
     }
 }

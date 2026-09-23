@@ -17,6 +17,8 @@ import com.example.pokemoncardbattle.components.BattleArea
 import com.example.pokemoncardbattle.components.PlayerHand
 import com.example.pokemoncardbattle.components.GameResults
 import com.example.pokemoncardbattle.components.GameControls
+import androidx.compose.foundation.background
+
 
 // Displays the main game screen with players and the battle area.
 @Composable
@@ -99,9 +101,9 @@ fun GameScreen(onBack: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 12.dp, vertical = 100.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         // Display the scoreboard for all three players.
@@ -110,11 +112,20 @@ fun GameScreen(onBack: () -> Unit) {
             playerHands = playerHands
         )
 
+        Spacer(modifier = Modifier.height(70.dp))
+
         // Battle area.
-        BattleArea(
-            leadType = leadType,
-            visiblePlayedCards = visiblePlayedCards
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            BattleArea(
+                leadType = leadType,
+                visiblePlayedCards = visiblePlayedCards
+            )
+        }
 
         // Current player
         Column(
@@ -223,7 +234,7 @@ fun GameScreen(onBack: () -> Unit) {
                 onBack = onBack
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
         }
     }
