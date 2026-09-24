@@ -61,15 +61,25 @@ fun GameControls(
         Spacer(modifier = Modifier.height(8.dp))
 
         // Return to the home screen.
-        OutlinedButton(
-            onClick = onBack,
-            modifier = Modifier.fillMaxWidth(0.75f),
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        ) {
-            Text("BACK TO HOME")
-        }
+        BackToHomeButton(
+            onBack = onBack
+        )
+    }
+}
+
+// Displays a button that returns to the home screen.
+@Composable
+fun BackToHomeButton(
+    onBack: () -> Unit
+) {
+    OutlinedButton(
+        onClick = onBack,
+        modifier = Modifier.fillMaxWidth(0.75f),
+        shape = RoundedCornerShape(8.dp),
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    ) {
+        Text("BACK TO HOME")
     }
 }

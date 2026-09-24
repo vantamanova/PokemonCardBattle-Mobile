@@ -34,12 +34,27 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             PokemonCardBattleTheme {
-                var showGame by remember { mutableStateOf(false) }
+                var currentScreen by remember { mutableStateOf("home") }
 
-                if (showGame) {
-                    GameScreen(onBack = { showGame = false })
-                } else {
-                    HomeScreen(onStart = { showGame = true })
+                when (currentScreen) {
+                    "game" -> {
+                        GameScreen(
+                            onBack = { currentScreen = "home" }
+                        )
+                    }
+
+                    "rules" -> {
+                        RulesScreen(
+                            onBack = { currentScreen = "home" }
+                        )
+                    }
+
+                    else -> {
+                        HomeScreen(
+                            onStart = { currentScreen = "game" },
+                            onRules = { currentScreen = "rules" }
+                        )
+                    }
                 }
             }
         }
@@ -48,7 +63,10 @@ class MainActivity : ComponentActivity() {
 
 // Displays the main menu of the game.
 @Composable
-fun HomeScreen(onStart: () -> Unit) {
+fun HomeScreen(
+    onStart: () -> Unit,
+    onRules: () -> Unit
+) {
 
     val context = LocalContext.current
 
@@ -194,15 +212,28 @@ fun HomeScreen(onStart: () -> Unit) {
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
-
                     Text(
-                        text = "ENTER THE ARENA",
+                        text = "START THE GAME",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = androidx.compose.ui.unit.TextUnit(
                             1f,
                             androidx.compose.ui.unit.TextUnitType.Sp
                         )
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedButton(
+                    onClick = onRules,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp)
+                ) {
+                    Text(
+                        text = "HOW TO PLAY",
+                        style = MaterialTheme.typography.titleLarge,
                     )
                 }
             }
