@@ -16,8 +16,12 @@ import com.example.pokemoncardbattle.PokemonCard
 @Composable
 fun Scoreboard(
     players: List<Player>,
-    playerHands: Map<Player, SnapshotStateList<PokemonCard>>
+    playerHands: Map<Player, SnapshotStateList<PokemonCard>>,
+    scoreVersion: Int
 ) {
+    // Read this value so the scoreboard refreshes when scores change.
+    scoreVersion
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally

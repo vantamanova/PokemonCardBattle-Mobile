@@ -98,6 +98,11 @@ fun GameScreen(onBack: () -> Unit) {
         mutableStateOf<List<Player>?>(null)
     }
 
+    // Forces the scoreboard to refresh when scores are updated.
+    var scoreVersion by remember {
+        mutableStateOf(0)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -109,7 +114,8 @@ fun GameScreen(onBack: () -> Unit) {
         // Display the scoreboard for all three players.
         Scoreboard(
             players = players,
-            playerHands = playerHands
+            playerHands = playerHands,
+            scoreVersion = scoreVersion
         )
 
         Spacer(modifier = Modifier.height(70.dp))
@@ -208,6 +214,9 @@ fun GameScreen(onBack: () -> Unit) {
                 onShowResult = {
                     // Calculate the winner and update the score.
                     turnWinner = game.determineTurnWinner()
+
+                    // Refresh the scoreboard after the score changes.
+                    scoreVersion++
 
                     // Check whether all players have finished their cards.
                     if (players.all { it.hand.isEmpty() }) {
