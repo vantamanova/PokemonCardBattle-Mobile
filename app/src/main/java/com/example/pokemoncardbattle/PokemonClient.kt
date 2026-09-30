@@ -5,7 +5,7 @@ import java.net.Socket
 
 class PokemonClient {
 
-    fun connectToServer() {
+    fun connectToServer(): String {
         Log.d("PokemonNetwork", "Trying to connect...")
 
         // Connect to the server through the ADB reverse port
@@ -26,5 +26,6 @@ class PokemonClient {
         Log.d("PokemonNetwork", "Received response: $response")
 
         socket.close()
+        return response
     }
 }

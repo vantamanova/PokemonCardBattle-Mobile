@@ -35,10 +35,16 @@ class MainActivity : ComponentActivity() {
         android.util.Log.d("PokemonNetwork", "MAIN ACTIVITY STARTED")
         // Test connection to the Pokemon server
         // runs the networking work separately from the UI thread
+        var serverResponse by mutableStateOf("Waiting for server...")
+
         thread {
             try {
                 val client = PokemonClient()
-                client.connectToServer()
+                val response = client.connectToServer()
+
+                runOnUiThread {
+                    serverResponse = response
+                }
             } catch (e: Exception) {
                 android.util.Log.e(
                     "PokemonNetwork",
@@ -68,7 +74,8 @@ class MainActivity : ComponentActivity() {
                     else -> {
                         HomeScreen(
                             onStart = { currentScreen = "game" },
-                            onRules = { currentScreen = "rules" }
+                            onRules = { currentScreen = "rules" },
+                            serverResponse = serverResponse
                         )
                     }
                 }
@@ -81,7 +88,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun HomeScreen(
     onStart: () -> Unit,
-    onRules: () -> Unit
+    onRules: () -> Unit,
+    serverResponse: String
 ) {
 
     val context = LocalContext.current
@@ -216,6 +224,13 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Text(
+                    text = serverResponse,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
                 // Start a new game
                 Button(
                     onClick = onStart,
