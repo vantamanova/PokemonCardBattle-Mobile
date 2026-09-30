@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "PokemonCardBattle"
 include(":app")
+include(":server")

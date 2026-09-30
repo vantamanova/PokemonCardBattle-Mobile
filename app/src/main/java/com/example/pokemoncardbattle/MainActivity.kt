@@ -26,11 +26,27 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
+import kotlin.concurrent.thread
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        android.util.Log.d("PokemonNetwork", "MAIN ACTIVITY STARTED")
+        // Test connection to the Pokemon server
+        // runs the networking work separately from the UI thread
+        thread {
+            try {
+                val client = PokemonClient()
+                client.connectToServer()
+            } catch (e: Exception) {
+                android.util.Log.e(
+                    "PokemonNetwork",
+                    "Connection failed: ${e.message}",
+                    e
+                )
+            }
+        }
 
         setContent {
             PokemonCardBattleTheme {
