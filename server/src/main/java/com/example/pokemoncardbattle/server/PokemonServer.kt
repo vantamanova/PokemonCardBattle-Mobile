@@ -14,6 +14,21 @@ fun main() {
 
     println("Client connected!")
 
+    // Read the request sent by the client
+    val reader = clientSocket.getInputStream().bufferedReader()
+    val request = reader.readLine()
+
+    println("Received request: $request")
+
+    // Send a response back to the client
+    val writer = clientSocket.getOutputStream().bufferedWriter()
+
+    writer.write("HELLO CLIENT")
+    writer.newLine()
+    writer.flush()
+
+    println("Response sent: HELLO CLIENT")
+
     clientSocket.close()
     serverSocket.close()
 }

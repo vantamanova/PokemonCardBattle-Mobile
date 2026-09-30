@@ -8,10 +8,22 @@ class PokemonClient {
     fun connectToServer() {
         Log.d("PokemonNetwork", "Trying to connect...")
 
-        // 10.0.2.2 lets the Android emulator connect to the host computer
+        // Connect to the server through the ADB reverse port
         val socket = Socket("127.0.0.1", 5000)
 
         Log.d("PokemonNetwork", "Connected to Pokemon server!")
+
+        // Send request to the server
+        val writer = socket.getOutputStream().bufferedWriter()
+        writer.write("HELLO SERVER")
+        writer.newLine()
+        writer.flush()
+
+        // Receive response from the server
+        val reader = socket.getInputStream().bufferedReader()
+        val response = reader.readLine()
+
+        Log.d("PokemonNetwork", "Received response: $response")
 
         socket.close()
     }
