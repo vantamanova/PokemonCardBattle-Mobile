@@ -19,55 +19,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.pokemoncardbattle.ui.theme.PokemonCardBattleTheme
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.style.TextOverflow
-import kotlin.concurrent.thread
+
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        android.util.Log.d("PokemonNetwork", "MAIN ACTIVITY STARTED")
-
-        // Test connection to the Pokemon server
-        // runs the networking work separately from the UI thread
-        var objectiveResponse by mutableStateOf("Loading objective...")
-        var playingResponse by mutableStateOf("Loading playing rules...")
-        var followTypeResponse by mutableStateOf("Loading type rules...")
-        var typesResponse by mutableStateOf("Loading type advantages...")
-        var scoringResponse by mutableStateOf("Loading scoring...")
-
-        thread {
-            try {
-                val client = PokemonClient()
-
-                // Request the five types of game information from the server
-                val objective = client.connectToServer("GET_OBJECTIVE")
-                val playing = client.connectToServer("GET_PLAYING")
-                val followType = client.connectToServer("GET_FOLLOW_TYPE")
-                val types = client.connectToServer("GET_TYPES")
-                val scoring = client.connectToServer("GET_SCORING")
-
-                runOnUiThread {
-                    objectiveResponse = objective
-                    playingResponse = playing
-                    followTypeResponse = followType
-                    typesResponse = types
-                    scoringResponse = scoring
-                }
-            } catch (e: Exception) {
-                android.util.Log.e(
-                    "PokemonNetwork",
-                    "Connection failed: ${e.message}",
-                    e
-                )
-            }
-        }
 
         setContent {
             PokemonCardBattleTheme {
@@ -82,12 +43,7 @@ class MainActivity : ComponentActivity() {
 
                     "rules" -> {
                         RulesScreen(
-                            onBack = { currentScreen = "home" },
-                            objectiveResponse = objectiveResponse,
-                            playingResponse = playingResponse,
-                            followTypeResponse = followTypeResponse,
-                            typesResponse = typesResponse,
-                            scoringResponse = scoringResponse
+                            onBack = { currentScreen = "home" }
                         )
                     }
 
@@ -124,7 +80,6 @@ fun HomeScreen(
     }
 
     val gold = MaterialTheme.colorScheme.primary
-    val secondaryText = MaterialTheme.colorScheme.onSurfaceVariant
 
     Box(
         modifier = Modifier

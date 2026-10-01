@@ -36,7 +36,7 @@ fun main() {
                 "The first card sets the lead type. If you have a card of that type, you must play it."
 
             "GET_TYPES" ->
-                "Fire beats Grass. Grass beats Water. Water beats Fire."
+                "Type advantage is checked first. If there is no type advantage, HP determines the winner."
 
             "GET_SCORING" ->
                 "The winner of each battle earns 10 points. After 5 battles, the player with the highest score wins!"

@@ -8,17 +8,48 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.pokemoncardbattle.components.BackToHomeButton
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+import kotlin.concurrent.thread
+import androidx.activity.ComponentActivity
+import com.example.pokemoncardbattle.components.RuleRequestButton
 
 // Displays the game rules and instructions.
 @Composable
 fun RulesScreen(
-    onBack: () -> Unit,
-    objectiveResponse: String,
-    playingResponse: String,
-    followTypeResponse: String,
-    typesResponse: String,
-    scoringResponse: String
+    onBack: () -> Unit
 ) {
+    var serverResponse by remember {
+        mutableStateOf("")
+    }
+
+    var selectedRequest by remember {
+        mutableStateOf<String?>(null)
+    }
+
+    val context = LocalContext.current
+
+    // Sends a request to the server and receives the response.
+    fun requestFromServer(request: String) {
+        selectedRequest = request
+        serverResponse = "Loading..."
+
+        thread {
+            try {
+                val client = PokemonClient()
+                val response = client.connectToServer(request)
+
+                (context as ComponentActivity).runOnUiThread {
+                    serverResponse = response
+                }
+            } catch (e: Exception) {
+                (context as ComponentActivity).runOnUiThread {
+                    serverResponse = "Could not connect to server."
+                }
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -41,30 +72,42 @@ fun RulesScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
 
-            RuleSection(
+            RuleRequestButton(
                 title = "OBJECTIVE",
-                description = objectiveResponse
+                response = if (selectedRequest == "GET_OBJECTIVE") serverResponse else null,
+                onClick = { requestFromServer("GET_OBJECTIVE") }
             )
 
-            RuleSection(
+            Spacer(modifier = Modifier.height(10.dp))
+
+            RuleRequestButton(
                 title = "PLAYING A CARD",
-                description = playingResponse
+                response = if (selectedRequest == "GET_PLAYING") serverResponse else null,
+                onClick = { requestFromServer("GET_PLAYING") }
             )
 
-            RuleSection(
+            Spacer(modifier = Modifier.height(10.dp))
+
+            RuleRequestButton(
                 title = "FOLLOW THE TYPE",
-                description = followTypeResponse
+                response = if (selectedRequest == "GET_FOLLOW_TYPE") serverResponse else null,
+                onClick = { requestFromServer("GET_FOLLOW_TYPE") }
             )
 
-            RuleSection(
+            Spacer(modifier = Modifier.height(10.dp))
+
+            RuleRequestButton(
                 title = "TYPE ADVANTAGE",
-                description = typesResponse
+                response = if (selectedRequest == "GET_TYPES") serverResponse else null,
+                onClick = { requestFromServer("GET_TYPES") }
             )
 
-            RuleSection(
+            Spacer(modifier = Modifier.height(10.dp))
+
+            RuleRequestButton(
                 title = "SCORING",
-                description = scoringResponse,
-                showDivider = false
+                response = if (selectedRequest == "GET_SCORING") serverResponse else null,
+                onClick = { requestFromServer("GET_SCORING") }
             )
         }
 
@@ -73,38 +116,5 @@ fun RulesScreen(
         BackToHomeButton(
             onBack = onBack
         )
-    }
-}
-
-
-// Displays one section of the game rules.
-@Composable
-fun RuleSection(
-    title: String,
-    description: String,
-    showDivider: Boolean = true
-) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.primary
-    )
-
-    Spacer(modifier = Modifier.height(5.dp))
-
-    Text(
-        text = description,
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onBackground
-    )
-
-    if (showDivider) {
-        Spacer(modifier = Modifier.height(12.dp))
-
-        HorizontalDivider(
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
     }
 }
