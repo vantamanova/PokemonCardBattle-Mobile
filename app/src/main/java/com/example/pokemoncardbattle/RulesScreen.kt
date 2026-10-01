@@ -12,7 +12,12 @@ import com.example.pokemoncardbattle.components.BackToHomeButton
 // Displays the game rules and instructions.
 @Composable
 fun RulesScreen(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    objectiveResponse: String,
+    playingResponse: String,
+    followTypeResponse: String,
+    typesResponse: String,
+    scoringResponse: String
 ) {
     Column(
         modifier = Modifier
@@ -38,27 +43,27 @@ fun RulesScreen(
 
             RuleSection(
                 title = "OBJECTIVE",
-                description = "Win battles and finish the game with the highest score."
+                description = objectiveResponse
             )
 
             RuleSection(
                 title = "PLAYING A CARD",
-                description = "Each player receives 5 Pokémon cards. Players take turns playing one card."
+                description = playingResponse
             )
 
             RuleSection(
                 title = "FOLLOW THE TYPE",
-                description = "The first card sets the lead type. If you have a card of that type, you must play it."
+                description = followTypeResponse
             )
 
             RuleSection(
-                title = "WINNING A BATTLE",
-                description = "Type advantage is checked first. If there is no type advantage, HP determines the winner."
+                title = "TYPE ADVANTAGE",
+                description = typesResponse
             )
 
             RuleSection(
                 title = "SCORING",
-                description = "The winner of each battle earns 10 points. After 5 battles, the player with the highest score wins!",
+                description = scoringResponse,
                 showDivider = false
             )
         }

@@ -33,17 +33,32 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         android.util.Log.d("PokemonNetwork", "MAIN ACTIVITY STARTED")
+
         // Test connection to the Pokemon server
         // runs the networking work separately from the UI thread
-        var serverResponse by mutableStateOf("Waiting for server...")
+        var objectiveResponse by mutableStateOf("Loading objective...")
+        var playingResponse by mutableStateOf("Loading playing rules...")
+        var followTypeResponse by mutableStateOf("Loading type rules...")
+        var typesResponse by mutableStateOf("Loading type advantages...")
+        var scoringResponse by mutableStateOf("Loading scoring...")
 
         thread {
             try {
                 val client = PokemonClient()
-                val response = client.connectToServer()
+
+                // Request the five types of game information from the server
+                val objective = client.connectToServer("GET_OBJECTIVE")
+                val playing = client.connectToServer("GET_PLAYING")
+                val followType = client.connectToServer("GET_FOLLOW_TYPE")
+                val types = client.connectToServer("GET_TYPES")
+                val scoring = client.connectToServer("GET_SCORING")
 
                 runOnUiThread {
-                    serverResponse = response
+                    objectiveResponse = objective
+                    playingResponse = playing
+                    followTypeResponse = followType
+                    typesResponse = types
+                    scoringResponse = scoring
                 }
             } catch (e: Exception) {
                 android.util.Log.e(
@@ -67,15 +82,19 @@ class MainActivity : ComponentActivity() {
 
                     "rules" -> {
                         RulesScreen(
-                            onBack = { currentScreen = "home" }
+                            onBack = { currentScreen = "home" },
+                            objectiveResponse = objectiveResponse,
+                            playingResponse = playingResponse,
+                            followTypeResponse = followTypeResponse,
+                            typesResponse = typesResponse,
+                            scoringResponse = scoringResponse
                         )
                     }
 
                     else -> {
                         HomeScreen(
                             onStart = { currentScreen = "game" },
-                            onRules = { currentScreen = "rules" },
-                            serverResponse = serverResponse
+                            onRules = { currentScreen = "rules" }
                         )
                     }
                 }
@@ -88,8 +107,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun HomeScreen(
     onStart: () -> Unit,
-    onRules: () -> Unit,
-    serverResponse: String
+    onRules: () -> Unit
 ) {
 
     val context = LocalContext.current
@@ -224,12 +242,6 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = serverResponse,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
 
                 // Start a new game
                 Button(

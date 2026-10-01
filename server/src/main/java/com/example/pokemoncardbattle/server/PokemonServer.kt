@@ -7,28 +7,53 @@ fun main() {
     val serverSocket = ServerSocket(5000)
 
     println("Pokemon server started on port 5000")
-    println("Waiting for a client...")
 
-    // Wait until a client connects
-    val clientSocket = serverSocket.accept()
+    // Keep the server running and wait for client requests
+    while (true) {
 
-    println("Client connected!")
+        println("Waiting for a client...")
 
-    // Read the request sent by the client
-    val reader = clientSocket.getInputStream().bufferedReader()
-    val request = reader.readLine()
+        val clientSocket = serverSocket.accept()
 
-    println("Received request: $request")
+        println("Client connected!")
 
-    // Send a response back to the client
-    val writer = clientSocket.getOutputStream().bufferedWriter()
+        // Read the request sent by the client
+        val reader = clientSocket.getInputStream().bufferedReader()
+        val request = reader.readLine()
 
-    writer.write("HELLO CLIENT")
-    writer.newLine()
-    writer.flush()
+        println("Received request: $request")
 
-    println("Response sent: HELLO CLIENT")
+        // Choose response based on client's request
+        val response = when (request) {
 
-    clientSocket.close()
-    serverSocket.close()
+            "GET_OBJECTIVE" ->
+                "Win battles and finish the game with the highest score."
+
+            "GET_PLAYING" ->
+                "Each player receives 5 Pokemon cards. Players take turns playing one card."
+
+            "GET_FOLLOW_TYPE" ->
+                "The first card sets the lead type. If you have a card of that type, you must play it."
+
+            "GET_TYPES" ->
+                "Fire beats Grass. Grass beats Water. Water beats Fire."
+
+            "GET_SCORING" ->
+                "The winner of each battle earns 10 points. After 5 battles, the player with the highest score wins!"
+
+            else ->
+                "Unknown request"
+        }
+
+        // Send the response back to the client
+        val writer = clientSocket.getOutputStream().bufferedWriter()
+        writer.write(response)
+        writer.newLine()
+        writer.flush()
+
+        println("Response sent: $response")
+
+        // Close this client connection, but keep the server running
+        clientSocket.close()
+    }
 }
