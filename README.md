@@ -1,24 +1,32 @@
 # Overview
 
-I created a Pokémon Card Battle mobile app for Android. The game is designed for three players. Each player receives five Pokémon cards and takes turns choosing a card to play. The game uses Pokémon types and HP to determine the winner. The highest score wins the game.
+I created a networking system for my Pokémon Card Battle Android app. The program uses a Kotlin server and an Android client. The client can send requests to the server and display the responses in the app.
 
-The purpose for creating this app was to learn the basics of Android mobile development.
+To use the program, first start the Kotlin server. Then start the Android app on the emulator. On the Rules screen, you can press different buttons to request information from the server.
+
+Purpose of this project was to learn how client-server communication works and how to use networking in an Android application.
+
+# Network Communication
+
+The program uses a client-server architecture. The Kotlin program is the server, and the Android application is the client.
+
+The program uses TCP sockets and port 5000.
+
+The client sends simple text requests to the server. The server reads the request and sends a text response back to the Android app.
 
 # Development Environment
 
-I developed this app using Android Studio.
+I used Android Studio to develop and test the project. I also used an Android emulator to run the mobile application.
 
-The app was written in Kotlin. I used Jetpack Compose to create the user interface.
+The project is written in Kotlin. I used Java socket classes such as ServerSocket and Socket for network communication and Jetpack Compose for the Android user interface.
 
 # Useful Websites
 
-* [Android Studio](https://developer.android.com/studio)
-* [Create your first Android app](https://developer.android.com/codelabs/basic-android-kotlin-compose-first-app#0)
-* [PokeAPI Sprites](https://github.com/PokeAPI/sprites)
+* [Client–server model](https://en.wikipedia.org/wiki/Client%E2%80%93server_model)
+* [Lesson: All About Sockets](https://docs.oracle.com/javase/tutorial/networking/sockets/index.html)
 
 # Future Work
 
-* Add the option to enter player names
-* Add more Pokémon and game rules
-* Improve animations and visual effects
-* Add a profile page and the ability to log in
+* Send more game information between the client and server.
+* Improve connection error handling.
+* Use networking as part of the actual Pokémon battles.
